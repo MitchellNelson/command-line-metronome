@@ -1,28 +1,33 @@
 import argparse
 import time
 import simpleaudio as sa
+import os
+import threading
 
 SOUND_PATH = 'audio/beat.wav'
-TIMING_OFFSET = .004
 
 class Metronome:
     def __init__(self, bpm):
         self.bpm = bpm
         self.sound = sa.WaveObject.from_wave_file(SOUND_PATH)
-        self.downbeat = sa.WaveObject.from_wave_file(DOWNBEAT_SOUND_PATH)
-
+    
     def start(self):
-        print('Press Ctrl-C to terminate metronome')
-        sleep_time = (60.0 / self.bpm)
-        before = time.time()
-        while(1):
-            self.sound.play()
-            time.sleep(sleep_time - (time.time() - before) - TIMING_OFFSET)
-            before = time.time()
+        sleep_time = 60 / self.bpm
+        cptr = 0
+        time_start = time.time()
+        time_init = time.time()
+        while True:
+            cptr += 1
+            time_start = time.time()
+            time.sleep(((time_init + (sleep_time * cptr)) - time_start ))
+            t00 = threading.Thread(name='thread_request', target=self.sound.play, args=([]))
+            t00.start()
 
 def main():
+    pid = os.getpid()
+    os.system("sudo renice -n -19 -p " + str(pid)) 
     parser = argparse.ArgumentParser(description='Play a sound at a tempo')
-    parser.add_argument('bpm', help='test')
+    parser.add_argument('bpm', type=int, help='test')
     args = parser.parse_args()
     metronome = Metronome(float(args.bpm))
     try:
