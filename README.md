@@ -3,4 +3,4 @@ Simple metronome built with python that is controlled via a command line interfa
 
 ## Run
 ```python main.py {bpm}```
-* Example: ```python main.py 120 
+* Example: ```python main.py 120``` 
